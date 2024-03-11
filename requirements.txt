@@ -1,0 +1,20 @@
+openai==1.11.1
+streamlit==1.30.0
+matplotlib==3.8.2
+snowflake-connector-python==3.6.0
+python-dotenv==1.0.0
+opencv-python==4.8.1.78
+llama-index==0.9.19
+chromadb==0.4.21
+langchain==0.1.0
+pypdf==3.17.4
+python-docx==1.1.0
+# googletrans==4.0.0-rc1 ---- incompatiable with openai
+nltk
+textblob
+scikit-learn
+wordcloud
+google-api-python-client==2.115.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.0
+openpyxl==3.1.2
