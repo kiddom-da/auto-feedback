@@ -3,52 +3,16 @@
 # 1. student submit answers to all questions
 # 2. grader grades the questions
 # 3. grader provides feedback to the student
-# 4. tts model generates audio feedback
 
 import streamlit as st
 from openai import OpenAI
 from math import floor
-from pathlib import Path
 import xml.etree.ElementTree as ET
 import html
 import re
 
 client = OpenAI()
 
-
-@st.cache_data()
-def generate_feedback_image(problem_statement:str,solution:dict, answer:str, image_url:str, teacher_notes:str):
-    response = client.chat.completions.create(
-        model="gpt-4-vision-preview",
-        temperature=0,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": f"""
-                 #context#: i am a math teacher for the fifth grade and i'd like to provide feedback to a student on a math problem.
-                 #objective#: provide specific and effective feedback 
-                 #tone#: either point to the right direction or ask guiding questions.
-                 #audience#: fifth grade student in the US.
-                 #problem statement#: {problem_statement}
-                 #solution#: {solution}
-                 #answer#: {answer}
-                 #teacher notes#: {teacher_notes}
-                
-                 #response#:
-                 """},
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": image_url,
-                },
-                },
-            ],
-            }
-        ],
-        max_tokens=1000, # careful with this 
-        )
-
-    return response.choices[0].message.content
 
 @st.cache_data()
 def analyze_multiple_select_image(problem_statement:str,solution:dict, answer:str, image_url:str, teacher_notes:str,
@@ -113,44 +77,6 @@ def analyze_multiple_select(problem_statement:str,solution:dict, answer:str, tea
         )
 
     return response.choices[0].message.content
-# 1. compare the student's answer to the solution. 
-#                  2. point out what went wrong.
-#                  3. evaluate the student's understanding of the skills tested {skills_tested}
-#                  4. provide a hint to guide the student to the right answer but never reveal the answer directly.
-@st.cache_data()
-def generate_feedback_short_response_image(problem_statement:str,solution:dict, answer:str, image_url:str, teacher_notes:str):
-    response = client.chat.completions.create(
-        model="gpt-4-vision-preview",
-        temperature=0,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": f"""
-                 #context#: i want to review a student's answer to a short response math problem containing images and provide feedback to the student.
-                 #objective#: provide concise and constructive feedback to a fifth grade student so that the student can figure out what they did wrong with some scaffolding.
-                 #tone#: positive, encouraging, and constructive.
-                 #audience#: fifth grade student in the US.
-                 #problem statement#: {problem_statement}
-                 #solution#: {solution}
-                 #answer#: {answer}
-                 #teacher notes#: {teacher_notes}
-
-                 #response#
-                 keep the feedback concise, no more than 2 sentences, and never reveal answers directly.
-                 """},
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": image_url,
-                },
-                },
-            ],
-            }
-        ],
-        max_tokens=1000, # careful with this 
-        )
-
-    return response.choices[0].message.content
 
 @st.cache_data()
 def summarize_analysis(analysis:str, solution:str, skills_tested:str):
@@ -163,7 +89,7 @@ def summarize_analysis(analysis:str, solution:str, skills_tested:str):
             {"role": "user",
             "content": f'''detailed analysis on the student's response to the question <analysis>{analysis}</analysis>. 
             provide short and specific feedback that follows these guidelines:
-            - here are the skill(s) being assessed: <skill_tested>{skills_tested}</skills_tested>; feedback needs to reflect the skills being assessed.
+            - here are the skill(s) being assessed: <skill_tested>{skills_tested}</skills_tested>; feedback needs to reflect the skills being assessed; if <skills_tested> is missing, provide feedback based on the analysis of the student's response.
             - focus on the areas where the student needs improvement.
             - keep it short, no more than 2 sentences; avoid qualifiers, encouragements, motivational text, etc. but remain age-appropriate for a fifth grader.
             - never reveal solution <solution>{solution}</solution>.
@@ -174,54 +100,6 @@ def summarize_analysis(analysis:str, solution:str, skills_tested:str):
         max_tokens=100, # careful with this
         )
     return response.choices[0].message.content
-
-def grade_short_response_image(problem_statement:str,solution:dict, answer:str, image_url:str, teacher_notes:str, points:int=4) -> int:
-    response = client.chat.completions.create(
-        model="gpt-4-vision-preview",
-        temperature=0,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": f"""
-                 You are a short response question grader for math grade 5.
-                 given problem statement, optional solution, teacher's note, a fifth grade student's answer, and the total points, grade it.
-                 problem statement: {problem_statement}
-                 solution: {solution}
-                 answer: {answer}
-                 teacher notes: {teacher_notes}
-
-                 Return an integer between 0 and {points}
-                 """},
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": image_url,
-                },
-                },
-            ],
-            }
-        ],
-        )
-
-    return int(response.choices[0].message.content)
-
-def grade_short_answer(teacher_notes:str, solution:str, answer:str, points:int=4) -> int:
-    response = client.chat.completions.create(
-      model="gpt-4",
-      temperature=0,
-      messages=[
-        {"role": "system"
-         , "content": """
-        You are a short answer question grader for math grade 5.
-        given solution, teacher's note, and student's answer, and the total points, grade it."""},
-        {"role": "user", "content": 
-         f'''teacher note: {teacher_notes}
-           solution: {solution} 
-           student's answer: {answer}. 
-         Return an integer between 0 and {points}'''},
-      ]
-    )
-    return int(response.choices[0].message.content)
 
 def calculate_multiple_select_score(solution:dict, answer:dict, points:int=4) -> int:
     """
@@ -305,6 +183,70 @@ if __name__ == "__main__":
     st.set_page_config(layout="wide")
     st.title("Math Multiple Select Assessment Question Response Analyzer")
     st.write("""---""")
+    firstname = st.sidebar.text_input("Student Name", "mary")
+    # st.subheader("Grade 5.1 End Of Unit Assessment")
+    # st.markdown("""original assessment can be found [here](https://app.kiddom.co/curriculum/668921/node/96d23c51-999f-4bed-89fa-d8e563d64338:a13e0dea-153c-11ee-970f-02fe2bddb0a9:b58683cc-11d1-11ee-84bc-0606465fe01b)
+    # taking; and how we calculate [partial credits](https://kiddom.atlassian.net/wiki/spaces/GR/pages/377356294/Partial+Credit+-+Product+Brief)
+    # """)
+    full_score_fd = "Great job! You got it right!"
+
+    st.write("""---""")
+    question_0 = {
+        'url': 'https://app.kiddom.co/curriculum/668921/node/96d23c51-999f-4bed-89fa-d8e563d64338:a13e0dea-153c-11ee-970f-02fe2bddb0a9:b5867a5f-11d1-11ee-82b2-0606465fe01b',
+        'statement': "Which expressions represent the volume of this rectangular prism in cubic units?",
+        'image_old_url': 'https://kiddom-media-production.s3.amazonaws.com/IM/Math/6/hhh79ylh5pn2k4cif25s9unvgqks',
+        'image_url': 'https://i.ibb.co/pW5dPjW/q0.png',
+        'solutions': {
+            "A 3 * 4 * 6":True,
+            "B 24 * 12":False,
+            "C 12 + 12 + 12":False,
+            "D 24 + 24 + 24 + 24 ":True,
+            "E 18 * 4":True
+        },
+        'options': {
+            "A 3 * 4 * 6":False,
+            "B 24 * 12":False,
+            "C 12 + 12 + 12":False,
+            "D 24 + 24 + 24 + 24 ":True,
+            "E 18 * 4":False
+        },
+        'teacher_notes': '''''',
+        'skills_tested': {'': ''} # empty str if missing
+    }
+    question_0_skills_concatenated = '\n'.join(question_0['skills_tested'].values())
+    st.markdown(f"**KHIM-G5-U1-Section B Checkpoint Question 2**. ([link to original question]({question_0['url']})) {question_0['statement']}", unsafe_allow_html=True)
+    st.write(f"0. {question_0['statement']}")
+    st.image(question_0['image_url'], caption="", use_column_width=False)
+
+    question_0_options_checked = {}
+    for option, correct in question_0['options'].items():
+        question_0_options_checked[option] = st.checkbox(option, value=correct, key=option)
+    
+    with st.expander('answers | score | analysis | feedback'):
+        st.write('question 1')
+        col1, col2, col3, col4 = st.columns((1,1,2,1))
+        with col1:
+            st.write('*answer*', question_0_options_checked)
+        with col2:
+            score = calculate_multiple_select_score(solution=question_0['solutions'], answer=question_0_options_checked, points=4)
+            st.write('*score*', score)
+        with col3:
+            if score == 4:
+                st.write('*analysis*\n', full_score_fd)
+                # st.audio(render_audio(full_score_fd))
+            else:
+                fd = analyze_multiple_select_image(problem_statement=question_0['statement'], solution=question_0['solutions'],
+                                                                answer=question_0_options_checked, image_url=question_0['image_url'],
+                                                                teacher_notes=question_0['teacher_notes'], skills_tested=question_0_skills_concatenated)
+                st.write('*analysis*')
+                st.write(fd)
+        with col4:
+            if score != 4:
+                st.write("feedback\n")
+                fd_a = summarize_analysis(fd, question_0['solutions'], question_0_skills_concatenated)
+                st.write(fd_a)
+                
+    st.write("""---""")
     question_1 = {
         'statement': "Select **all** expressions that represent the volume of this rectangular prism in cubic units.",
         'image_url_old': 'https://kiddom-media-production.s3.amazonaws.com/IM/Math/6/rnmcnx6o0bnzg8ymqwv5dsu7l365',
@@ -349,7 +291,6 @@ if __name__ == "__main__":
     for option, correct in question_1['options'].items():
         question_1_options_checked[option] = st.checkbox(option, value=correct, key=option)
 
-    full_score_fd = "Great job! You got it right!"
     with st.expander('answers | score | analysis | feedback'):
         st.write('question 1')
         col1, col2, col3, col4 = st.columns((1,1,2,1))
