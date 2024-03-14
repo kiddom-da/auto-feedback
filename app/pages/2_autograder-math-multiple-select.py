@@ -200,7 +200,7 @@ if __name__ == "__main__":
             "A 3 * 4 * 6":True,
             "B 24 * 12":False,
             "C 12 + 12 + 12":False,
-            "D 24 + 24 + 24 ":True,
+            "D 24 + 24 + 24":True,
             "E 18 * 4":True
         },
         'options': {
