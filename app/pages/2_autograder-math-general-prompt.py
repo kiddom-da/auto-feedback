@@ -723,3 +723,143 @@ if __name__ == "__main__":
                  then we feed the answer to part a, b, and c then the answer to part d. programmatic solution may NOT be straightforward.
                  by the way, in query we can see that the teacher's grade is also 2.
                  """)
+        
+    st.write("""---""")
+    question_5_parta_data = {
+        'url': 'https://app.kiddom.co/curriculum/f4564f98-834e-4b10-89f2-0e60d1b0ade3:635e1736-d5a1-11ee-982e-02ee8932281d/node/f4564f98-834e-4b10-89f2-0e60d1b0ade3:635e1736-d5a1-11ee-982e-02ee8932281d:63e88ffb-d5a1-11ee-b642-02ee8932281d',
+        'other_notes': '**G6-KHIM-5.3.A1-CP Problem 5 PART A** Chosen b/c its an activity, and solution is identical to the teaching note',
+        'statement': '''A sandwich shop serves 4 ounces of meat and 3 ounces of cheese on each sandwich. After making sandwiches for an hour, the shop owner has used 91 combined ounces of meat and cheese.
+         Part A: How many combined ounces of meat and cheese are used on each sandwich?''',  # overarching statement
+        'point': 4,
+        'question_type': 'fill_in_the_blank',
+        'assignment_type': 'assessment',
+        'image_url_in_statement': None,
+        'image_in_statement_alt': None, 
+        'solution': '7',
+        'answer': '4',
+        'teacher_notes': '''7 ounces''',
+        'skills_tested': []
+    }   
+    question_5_parta = Question(**question_5_parta_data)
+    st.markdown(f"{question_5_parta.other_notes}. ([link to original question]({question_5_parta.url}))")
+    st.write(f"{question_5_parta.statement}")
+    st.write(f"> teacher notes: {question_5_parta.teacher_notes}")
+    col1, col2 = st.columns((1,20))
+    with col1:
+        answer_5_parta = st.text_input('answer', value=question_5_parta.answer)
+    with col2:
+        st.write('')
+        st.write('')
+        st.write('ounces')
+    with st.expander('answers | score | analysis | feedback'):
+        st.write('question 5 part a')
+        col1, col2, col3, col4 = st.columns((1,1,2,1))
+        with col1:
+            st.write('*answer*', answer_5_parta)
+        with col2:
+            score = grade_short_answer(problem_statement=question_5_parta.statement, 
+                                       teacher_notes=question_5_parta.teacher_notes, solution=question_5_parta.solution, answer=answer_5_parta, points=4)
+            st.write('*score*', score)
+        with col3:
+            if score == question_5_parta.point:
+                st.write('*analysis*\n', FULL_SCORE_FEEDBACK)
+                # st.audio(render_audio(full_score_fd))
+            else:
+                analysis = analyze_student_response(problem_statement=question_5_parta.statement,
+                                                solution=question_5_parta.solution,
+                                                answer=answer_5_parta, 
+                                                image_url=question_5_parta.image_url_in_statement,
+                                                teacher_notes=question_5_parta.teacher_notes,
+                                                skills_tested=question_5_parta.skills_tested_str)
+                st.write('*analysis*')
+                st.write(analysis)
+                st.write('---')
+                analysis_red = analyze_student_response(problem_statement=question_5_parta.statement,
+                                                solution=question_5_parta.solution,
+                                                answer=answer_5_parta, 
+                                                image_url=question_5_parta.image_url_in_statement,
+                                                teacher_notes=None,
+                                                skills_tested=None)
+                st.write('*analysis without teacher notes nor skills tested*')
+                st.write(analysis_red)
+        with col4:
+            if score != 4:
+                st.write("feedback\n")
+                fd_a = summarize_analysis(analysis, question_5_parta.solution, question_5_parta.skills_tested_str, question_5_parta.teacher_notes)
+                st.write(fd_a)
+                st.write("---")
+                st.write("*feedback without teacher notes nor skills tested*")
+                fd_a_red = summarize_analysis(analysis_red, question_5_parta.solution, None, None)
+                st.write(fd_a_red)
+
+    st.write("""---""")
+    question_1_parta_data = {
+        'url': 'https://app.kiddom.co/curriculum/668915/node/0ea5255a-6e31-42f7-951b-bac095a4679e:64f36058-5e4a-11ee-ac67-066a39b724af:ab40ef47-574f-11ee-9e8a-06dd2b7bf731',
+        'other_notes': '**OUR-G8-U2-L1_WU Problem 1 PART A** Chosen b/c has interesting teacher notes',
+        'statement': '''
+        PROBLEM 1
+        MULTI PART QUESTION PROMPT
+        Find each quotient. Write your answer as a fraction or a mixed number.
+        PART A 
+        6 and one fourth divided by 2
+        ''', 
+        'point': 4,
+        'question_type': 'short_answer',
+        'assignment_type': 'activity',
+        'image_url_in_statement':None,
+        'image_in_statement_alt': None, 
+        'solution': '3 and one eighth',
+        'answer': '1/8',
+        'teacher_notes': '''3 and one eighth or 25/8. Possible strategies:
+        - 6 div 2 = 3 and 1/4 div 2 = 1/8
+        - 6 and 1/4 = 25/4, and 25/4 div 2 = 25/4 * 1/2 = 25/8
+        ''',
+        'skills_tested': []
+    }
+
+    question_1_parta = Question(**question_1_parta_data)
+    st.markdown(f"{question_1_parta.other_notes}. ([link to original question]({question_1_parta.url}))")
+    st.write(f"{question_1_parta.statement}")
+    st.write(f"> teacher notes: {question_1_parta.teacher_notes}")
+    answer_1_parta = st.text_input('answer', value=question_1_parta.answer)
+
+    with st.expander('answers | score | analysis | feedback'):
+        st.write('question 1 part a')
+        col1, col2, col3, col4 = st.columns((1,1,2,1))
+        with col1:
+            st.write('*answer*', answer_1_parta)
+        with col2:
+            score = grade_short_answer(problem_statement=question_1_parta.statement, 
+                                       teacher_notes=question_1_parta.teacher_notes, solution=question_1_parta.solution, answer=answer_1_parta, points=4)
+            st.write('*score*', score)
+        with col3:
+            if score == question_1_parta.point:
+                st.write('*analysis*\n', FULL_SCORE_FEEDBACK)
+                # st.audio(render_audio(full_score_fd))
+            else:
+                analysis = analyze_student_response(problem_statement=question_1_parta.statement,
+                                                solution=question_1_parta.solution,
+                                                answer=answer_1_parta, 
+                                                image_url=question_1_parta.image_url_in_statement,
+                                                teacher_notes=question_1_parta.teacher_notes,
+                                                skills_tested=question_1_parta.skills_tested_str)
+                st.write('*analysis*')
+                st.write(analysis)
+                st.write('---')
+                analysis_red = analyze_student_response(problem_statement=question_1_parta.statement,
+                                                solution=question_1_parta.solution,
+                                                answer=answer_1_parta, 
+                                                image_url=question_1_parta.image_url_in_statement,
+                                                teacher_notes=None,
+                                                skills_tested=None)
+                st.write('*analysis without teacher notes nor skills tested*')
+                st.write(analysis_red)
+        with col4:
+            if score != 4:
+                st.write("feedback\n")
+                fd_a = summarize_analysis(analysis, question_1_parta.solution, question_1_parta.skills_tested_str, question_1_parta.teacher_notes)
+                st.write(fd_a)
+                st.write("---")
+                st.write("*feedback without teacher notes nor skills tested*")
+                fd_a_red = summarize_analysis(analysis_red, question_1_parta.solution, None, None)
+                st.write(fd_a_red)
