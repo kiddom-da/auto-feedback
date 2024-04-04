@@ -552,7 +552,7 @@ if __name__ == "__main__":
         'assignment_type': 'assessment',
         'image_url_in_statement': None,
         'image_in_statement_alt': None, 
-        'solution': '$5.50',
+        'solution': '$1.65',
         'answer': '$.33',
         'teacher_notes': '''The numbers in this problem are messy enough that most students will need to calculate the unit price first, then multiply the unit price by the number of items. Look out for responses that involve calculating the unit price but do not go further.''',
         'skills_tested': [
