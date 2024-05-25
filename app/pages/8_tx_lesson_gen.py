@@ -641,7 +641,7 @@ if __name__ == '__main__':
     st.header('Learning Targets Generator')
     # a few inputs: a dropdown for grade level, standard, and description of the standard
     grade_level = st.selectbox('Select Grade Level', ['k', '1', '2', '3', '4', '5', '6', '7', '8', 'a1', 'a2', 'g'], index=3)
-    standard = st.text_input('Enter Standard', placeholder=f'{grade_level}.3.F.viii')
+    standard = st.text_input('Enter Standard', placeholder='3.F.viii')
     standard_description = st.text_area('Enter Standard Description (KSS. Expectation. Breakout Description)', height=150,
                                          placeholder='''Number and operations. 
 The student applies mathematical process standards to represent and explain fractional units. 
