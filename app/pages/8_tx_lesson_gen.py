@@ -641,7 +641,7 @@ if __name__ == '__main__':
     st.header('Learning Targets Generator')
     # a few inputs: a dropdown for grade level, standard, and description of the standard
     grade_level = st.selectbox('Select Grade Level', ['k', '1', '2', '3', '4', '5', '6', '7', '8', 'a1', 'a2', 'g'], index=3)
-    standard = st.text_input('Enter Standard', placeholder='3.F.viii')
+    standard = st.text_input('Enter Breakout Number', placeholder='3.F.viii')
     standard_description = st.text_area('Enter Standard Description (KSS. Expectation. Breakout Description)', height=150,
                                          placeholder='''Number and operations. 
 The student applies mathematical process standards to represent and explain fractional units. 
@@ -679,7 +679,8 @@ The student is expected to:
     if len(final_lts_ls) != 2:
         st.error("Please ensure there are two learning targets; there should be two 'I can' statements separated by a new line.")
         st.stop()
-        
+    
+    st.header('Lesson Plan Generator')
     if st.button('Generate Lesson Plan'):
         lw_start = time.time()
         raw_lesson_plan = {}
